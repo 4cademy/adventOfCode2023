@@ -2,6 +2,7 @@ r_max = 12
 g_max = 13
 b_max = 14
 
+
 def load_data():
     with open('game_doc') as f:
         data = []
