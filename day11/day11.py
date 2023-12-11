@@ -14,16 +14,19 @@ def expand_galaxy(data):
         if '#' not in line:
             expanded_galaxy_in_y.append(line)
 
-    expanded_galaxy_in_x = []
-    for i in range(len(expanded_galaxy_in_y)):
-        expanded_galaxy_in_x.append([])
+    inverted_galaxy = []
+    for i in range(len(expanded_galaxy_in_y[0])):
+        inverted_galaxy.append('')
+    for line in expanded_galaxy_in_y:
+        for i in range(len(line)):
+            inverted_galaxy[i] += line[i]
 
-    for col_index in range(len(expanded_galaxy_in_y[0])):
-        col = [row[col_index] for row in expanded_galaxy_in_y]
-        for row_index in range(len(col)):
-            expanded_galaxy_in_x[row_index].append(col[row_index])
-            if '#' not in col:
-                expanded_galaxy_in_x[row_index].append(col[row_index])
+    expanded_galaxy_in_x = []
+    for line in inverted_galaxy:
+        expanded_galaxy_in_x.append(line)
+        if '#' not in line:
+            expanded_galaxy_in_x.append(line)
+
     return expanded_galaxy_in_x
 
 
