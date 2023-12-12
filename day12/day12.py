@@ -1,5 +1,6 @@
 import copy
 
+
 def load_data():
     data = []
     with open('springs_test1') as f:
@@ -10,70 +11,91 @@ def load_data():
 
 
 def reformat_data(data):
-    refomated_data = []
+    reformatted_data = []
     for line in data:
         line = line.split(' ')
         line[1] = line[1].split(',')
         line[1] =[int(x) for x in line[1]]
-        refomated_data.append(line)
-    return refomated_data
+        reformatted_data.append(line)
+    return reformatted_data
 
 
-def find_first_fit(string, length):
-    for i in range(len(string)):
-        if i+length > len(string):
-            return -1
+def expand_data():
+    data = load_data()
+    reformatted_data = reformat_data(data)
+    expanded_data = []
+    for line in reformatted_data:
+        line[0] = line[0] + line[0] + line[0] + line[0] + line[0]
+        line[1] = line[1] + line[1] + line[1] + line[1] + line[1]
+        expanded_data.append(line)
+    return expanded_data
+
+
+def find_fits_in_string(string, length):
+    fits = []
+    for i in range(len(string)-length+1):
         if '.' not in string[i:i+length]:
-            return i
-
-
-def find_all_fits(string, length):
-    all_fits = []
-    last_index = 0
-    index = find_first_fit(string, length)
-    while index != -1 and len(string) >= length:
-        all_fits.append(last_index + index)
-        string = string[index+1:]
-        last_index += index + 1
-        index = find_first_fit(string, length)
-    return all_fits
+            fits.append([i, i+length-1])
+    return fits
 
 
 def find_fits_for_multiple_segments(string, lengths):
-    if len(lengths) == 1:
-        list_of_fits = []
-        fits = find_all_fits(string, lengths[0])
-        for fit in fits:
-            list_of_fits.append([fit, fit + lengths[0] - 1])
-        return list_of_fits
-    else:
-        length = lengths.pop(0)
-        working_string = string[length:]
-        list_of_fits = find_fits_for_multiple_segments(working_string, lengths)
-        new_list_of_fits = []
-        for fit in list_of_fits:
-            new_list_of_fits.append([fit[0] + length, fit[1] + length])
+    # print(f'Finding fits for {string} with lengths {lengths}')
+    fits = []
+    for length in lengths:
+        print(f'Finding fits for length {length}')
+        fits_for_this_length = find_fits_in_string(string, length)
+        if fits:
+            new_fits = []
+            for fit in fits:
+                for next_fit in fits_for_this_length:
+                    if fit[-1][1] < next_fit[0]-1:
+                        new_fits.append(fit + [next_fit])
+            fits = copy.deepcopy(new_fits)
+        else:
+            for fit in fits_for_this_length:
+                fits.append([fit])
+
+    actual_fits = []
+    for fit in fits:
+        # print(f'Checking fit {fit}')
+        tmp = string
+        for segment in fit:
+            for i in range(segment[0], segment[1]+1):
+                tmp = tmp[:i] + 'M' + tmp[i+1:]
+        # print(f'Fit: {tmp}')
+        if '#' not in tmp:
+            actual_fits.append(fit)
+
+    return actual_fits
 
 
 def task1(data):
     total = 0
-    all_fits = rekursive_find_all_fits('.???.?##', [1])
-    print(all_fits)
+    for line in data:
+        all_fits = find_fits_for_multiple_segments(line[0], line[1])
+        total += len(all_fits)
     return total
 
 
 def task2(data):
-    return
+    total = 0
+    for line in data:
+        print(f'Checking line {line}')
+        all_fits = find_fits_for_multiple_segments(line[0], line[1])
+        total += len(all_fits)
+    return total
 
 
 def main():
     data = load_data()
     data = reformat_data(data)
 
+    print(f'Task 1: {task1(data)}')
+
+    data = expand_data()
     for line in data:
         print(line)
-
-    print(f'Task 1: {task1(data)}')
     print(f'Task 2: {task2(data)}')
 
 

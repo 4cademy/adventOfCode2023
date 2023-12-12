@@ -1,6 +1,6 @@
 def load_data():
     data = []
-    with open('pipes') as f:
+    with open('pipes_test3') as f:
         for line in f.readlines():
             line = line.strip()
             data.append(line)
@@ -150,6 +150,9 @@ def fill_area_next_to_loop(data, coordinates):
                     data[y+1] = set_char(data[y+1], '1', x+1)
         prev_x = x
         prev_y = y
+        print('-------------------')
+        for line in data:
+            print(line)
     return data
 
 
@@ -174,6 +177,9 @@ def spread_filling(data, coordinates):
                                     if iter_x == 0 or iter_x == len(data[0])-1 or iter_y == 0 or iter_y == len(data)-1:
                                         is_outer_filling = True
                     check_coordinates.append((x, y))
+        print('-------------------')
+        for line in data:
+            print(line)
     return data, is_outer_filling
 
 
