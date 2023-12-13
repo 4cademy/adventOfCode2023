@@ -1,4 +1,5 @@
 import copy
+import functools
 import threading
 
 
@@ -197,6 +198,7 @@ def multithreading_task2(data):
     return 'Finished'
 
 
+@functools.cache
 def check_next(string, lengths, must_check_next=False):
     # match
     if '#' not in string and len(lengths) == 1 and lengths[0] == 0:
@@ -212,21 +214,25 @@ def check_next(string, lengths, must_check_next=False):
             if lengths[0] == 0:
                 if char == '#':
                     return 0
-                return check_next(string, lengths.copy()[1:], False)
+                return check_next(string, tuple(lengths[1:]), False)
             else:
                 if char == '.':
                     return 0
                 else:
+                    lengths = list(lengths)
                     lengths[0] -= 1
-                    return check_next(string, lengths.copy(), True)
+                    lengths = tuple(lengths)
+                    return check_next(string, tuple(lengths), True)
         else:
             if char == '.':
-                return check_next(string, lengths.copy())
+                return check_next(string, lengths)
             elif char == '#':
+                lengths = list(lengths)
                 lengths[0] -= 1
-                return check_next(string, lengths.copy(), True)
+                lengths = tuple(lengths)
+                return check_next(string, tuple(lengths), True)
             elif char == '?':
-                return check_next('.' + string, lengths.copy()) + check_next('#' + string, lengths.copy())
+                return check_next('.' + string, tuple(lengths)) + check_next('#' + string, tuple(lengths))
 
 
 def main():
@@ -240,9 +246,9 @@ def main():
 
     total = 0
     for line in data:
-        res = check_next(line[0], line[1])
+        res = check_next(line[0], tuple(line[1]))
         print(f'line {data.index(line)}: {res}')
-        total += check_next(line[0], line[1])
+        total += check_next(line[0], tuple(line[1]))
     print('------------------')
     print(f'Task 2: {total}')
 
