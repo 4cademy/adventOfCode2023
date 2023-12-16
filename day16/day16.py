@@ -16,20 +16,17 @@ def load_data():
 
 def move_through(data, output, start, direction):
     global checked_mirrors
-    print()
-    for line in output:
-        print(line)
 
     y, x = start
     next_pos = None
     if direction == 'up':
-        next_pos = (y-1, x)
+        next_pos = (y - 1, x)
     elif direction == 'down':
-        next_pos = (y+1, x)
+        next_pos = (y + 1, x)
     elif direction == 'left':
-        next_pos = (y, x-1)
+        next_pos = (y, x - 1)
     elif direction == 'right':
-        next_pos = (y, x+1)
+        next_pos = (y, x + 1)
     else:
         raise ValueError(f'Unknown direction: {direction}')
 
@@ -40,19 +37,18 @@ def move_through(data, output, start, direction):
     output[next_pos[0]][next_pos[1]] = '#'
     while next_char == '.':
         if direction == 'up':
-            next_pos = (next_pos[0]-1, next_pos[1])
+            next_pos = (next_pos[0] - 1, next_pos[1])
         elif direction == 'down':
-            next_pos = (next_pos[0]+1, next_pos[1])
+            next_pos = (next_pos[0] + 1, next_pos[1])
         elif direction == 'left':
-            next_pos = (next_pos[0], next_pos[1]-1)
+            next_pos = (next_pos[0], next_pos[1] - 1)
         elif direction == 'right':
-            next_pos = (next_pos[0], next_pos[1]+1)
+            next_pos = (next_pos[0], next_pos[1] + 1)
         if next_pos[0] < 0 or next_pos[0] >= len(data) or next_pos[1] < 0 or next_pos[1] >= len(data[0]):
             return
         next_char = data[next_pos[0]][next_pos[1]]
         output[next_pos[0]][next_pos[1]] = '#'
 
-    print(checked_mirrors)
     if tuple([next_pos, direction]) in checked_mirrors:
         return
 
@@ -122,8 +118,80 @@ def task1(data):
 
 
 def task2(data):
-    total = 0
-    return total
+    global checked_mirrors
+    max_value = 0
+
+    # left and right
+    for i in range(len(data)):
+        checked_mirrors = []
+        total = 0
+        output = []
+        for line in data:
+            line_array = []
+            for char in line:
+                line_array.append('.')
+            output.append(line_array)
+
+        move_through(data, output, (i, -1), 'right')
+
+        for line in output:
+            total += line.count('#')
+
+        if total > max_value:
+            max_value = total
+
+        total = 0
+        output = []
+        for line in data:
+            line_array = []
+            for char in line:
+                line_array.append('.')
+            output.append(line_array)
+
+        move_through(data, output, (i, len(data[0])), 'left')
+
+        for line in output:
+            total += line.count('#')
+
+        if total > max_value:
+            max_value = total
+
+    # top and bottom
+    for i in range(len(data[0])):
+        checked_mirrors = []
+        total = 0
+        output = []
+        for line in data:
+            line_array = []
+            for char in line:
+                line_array.append('.')
+            output.append(line_array)
+
+        move_through(data, output, (-1, i), 'down')
+
+        for line in output:
+            total += line.count('#')
+
+        if total > max_value:
+            max_value = total
+
+        total = 0
+        output = []
+        for line in data:
+            line_array = []
+            for char in line:
+                line_array.append('.')
+            output.append(line_array)
+
+        move_through(data, output, (len(data), i), 'up')
+
+        for line in output:
+            total += line.count('#')
+
+        if total > max_value:
+            max_value = total
+
+    return max_value
 
 
 def main():
