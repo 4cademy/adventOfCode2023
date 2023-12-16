@@ -3,7 +3,7 @@ import copy
 
 def load_data():
     data = []
-    with open('rocks_test1') as f:
+    with open('rocks') as f:
         for line in f.readlines():
             line_array = []
             for char in line.strip():
@@ -27,6 +27,9 @@ def tilt_north(data):
 
 
 def tilt360(data):
+    # for line in data:
+    #    print(line)
+    # print('Tilting north')
     changed = True
     while changed:
         changed = False
@@ -38,6 +41,9 @@ def tilt360(data):
                             data[i - 1][j] = 'O'
                             data[i][j] = '.'
                             changed = True
+    # for line in data:
+    #     print(line)
+    # print('Tilting west')
     changed = True
     while changed:
         changed = False
@@ -49,6 +55,9 @@ def tilt360(data):
                             data[i][j - 1] = 'O'
                             data[i][j] = '.'
                             changed = True
+    # for line in data:
+    #    print(line)
+    # print('Tilting south')
     changed = True
     while changed:
         changed = False
@@ -60,6 +69,9 @@ def tilt360(data):
                             data[i + 1][j] = 'O'
                             data[i][j] = '.'
                             changed = True
+    # for line in data:
+    #     print(line)
+    # print('Tilting east')
     changed = True
     while changed:
         changed = False
@@ -71,6 +83,9 @@ def tilt360(data):
                             data[i][j+1] = 'O'
                             data[i][j] = '.'
                             changed = True
+    # for line in data:
+    #     print(line)
+    # print('------------------')
 
 
 def matrices_equal(mat1, mat2):
@@ -83,6 +98,8 @@ def matrices_equal(mat1, mat2):
 
 def matching_matrix(mat_list, mat2):
     match = False
+
+    i = 0
     for i, mat in enumerate(mat_list):
         if matrices_equal(mat, mat2):
             match = True
@@ -92,17 +109,29 @@ def matching_matrix(mat_list, mat2):
 
 def find_loop(data):
     matrices = [copy.deepcopy(data)]
-    tilt360(data)
-    steps = 1
-    stop, offset = matching_matrix(matrices, data)
+    steps = 0
+    stop = False
+    offset = 0
     while not stop:
-        print(f'Step {steps}')
+        # print(f'Step {steps+1}:')
         tilt360(data)
+        stop, offset = matching_matrix(matrices, data)
         matrices.append(copy.deepcopy(data))
         steps += 1
-        stop, i = matching_matrix(matrices, data)
+        # for mat in matrices:
+        #    for line in mat:
+        #        print(line)
+        #    print()
+
     loop_length = steps-offset
-    return loop_length, offset
+    return offset, loop_length, matrices
+
+
+def calc_after_one_billion(matrix_history, offset, loop_length):
+    steps = 1000000000
+    steps = steps - offset
+    steps = steps % loop_length
+    return matrix_history[offset + steps]
 
 
 def task1(data):
@@ -116,8 +145,12 @@ def task1(data):
 
 def task2(data):
     total = 0
-    loop_length, offset = find_loop(data)
-    print(loop_length, offset)
+    offset, loop_length, matrix_history = find_loop(data)
+    print(offset, loop_length)
+    matrix = calc_after_one_billion(matrix_history, offset, loop_length)
+    for i, line in enumerate(matrix):
+        rocks = line.count('O')
+        total += rocks * (len(matrix) - i)
     return total
 
 
@@ -127,8 +160,8 @@ def main():
         print(line)
     print()
 
-    print(f'Task 1: {task1(data)}')
-    print(f'Task 2: {task2(data)}')
+    print(f'Task 1: {task1(copy.deepcopy(data))}')
+    print(f'Task 2: {task2(copy.deepcopy(data))}')
 
 
 if __name__ == '__main__':
