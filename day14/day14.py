@@ -3,7 +3,7 @@ import copy
 
 def load_data():
     data = []
-    with open('rocks_test1') as f:
+    with open('rocks') as f:
         for line in f.readlines():
             line_array = []
             for char in line.strip():
